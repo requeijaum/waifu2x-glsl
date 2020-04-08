@@ -5,7 +5,7 @@ PROGRAM = waifu2x_glsl
 CC	= clang
 CPP	= clang++
 #CFLAGS  = -Ofast -march=native -funroll-loops -mf16c -DDEBUG
-CFLAGS  = -Ofast -march=native -funroll-loops -mf16c
+CFLAGS  = -v -Ofast -march=native -funroll-loops -mf16c
 CPPFLAGS= $(CFLAGS)
 LDFLAGS	= -lm
 CSRC	= $(wildcard *.c)
@@ -22,11 +22,13 @@ ifeq ($(USE_GLES),1)
 	LDFLAGS	+= `pkg-config --libs glesv2 egl gl gbm`
 else
 	CFLAGS  += `pkg-config --cflags gl`
-	LDFLAGS	+= `pkg-config --libs gl` -lglfw
+	LDFLAGS	+= `pkg-config --libs gl -lglfw`
 endif
 endif
 ifeq ($(UNAME_S),Darwin)
-	LDFLAGS	+= -framework OpenGL -lglfw
+	CFLAGS  += -L/opt/local/lib -I/opt/local/include
+	LDFLAGS	+= -framework OpenGL -lglfw -L/opt/local/lib -I/opt/local/include
+	# using MacPorts' GLFW - using El Capitan 10.11.5
 endif
 
 %.o: %.cpp $(DEPS)
